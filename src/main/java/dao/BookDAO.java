@@ -9,8 +9,16 @@ import java.util.List;
 
 import static util.DatabaseUtil.getConnection;
 
+/**
+ * Classe responsável pelas operações CRUD para a entidade Book no banco de dados.
+ */
 public class BookDAO {
 
+    /**
+     * Insere um novo livro no banco.
+     * @param book objeto Book a ser inserido
+     * @throws SQLException em caso de erro na operação SQL
+     */
     public void insert(Book book) throws SQLException {
         String sql = "INSERT INTO book (title, author, year, genre, synopsis) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseUtil.getConnection();
@@ -26,6 +34,11 @@ public class BookDAO {
         }
     }
 
+    /**
+     * Busca todos os livros no banco ordenados por id.
+     * @return lista de livros
+     * @throws SQLException em caso de erro na operação SQL
+     */
     public List<Book> findAll() throws SQLException {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM book ORDER BY id";
@@ -49,6 +62,12 @@ public class BookDAO {
         return books;
     }
 
+    /**
+     * Busca livros que correspondem ao termo de busca em título ou autor.
+     * @param search termo de busca
+     * @return lista de livros que atendem ao filtro
+     * @throws SQLException em caso de erro na operação SQL
+     */
     public List<Book> findBySearch(String search) throws SQLException {
         List<Book> result = new ArrayList<>();
         String sql = "SELECT * FROM book WHERE title ILIKE ? OR author ILIKE ?";
@@ -73,6 +92,12 @@ public class BookDAO {
         return result;
     }
 
+    /**
+     * Busca um livro pelo seu ID.
+     * @param id identificador do livro
+     * @return objeto Book ou null se não encontrado
+     * @throws SQLException em caso de erro na operação SQL
+     */
     public Book findById(int id) throws SQLException {
         Book book = null;
         String sql = "SELECT * FROM book WHERE id = ?";
@@ -98,6 +123,11 @@ public class BookDAO {
         return book;
     }
 
+    /**
+     * Atualiza os dados de um livro existente no banco.
+     * @param book objeto Book com os dados atualizados
+     * @throws SQLException em caso de erro na operação SQL
+     */
     public void update(Book book) throws SQLException {
         String sql = "UPDATE book SET title = ?, author = ?, year = ?, genre = ?, synopsis = ? WHERE id = ?";
 
@@ -115,6 +145,11 @@ public class BookDAO {
         }
     }
 
+    /**
+     * Remove um livro pelo seu ID.
+     * @param id identificador do livro a ser removido
+     * @throws SQLException em caso de erro na operação SQL
+     */
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM book WHERE id = ?";
 

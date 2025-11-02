@@ -10,11 +10,20 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Servlet para gerenciamento das operações CRUD de filmes.
+ * Controla requisições HTTP relacionadas ao catálogo de filmes.
+ */
 @WebServlet("/movies")
 public class MovieServlet extends HttpServlet {
 
+    /** Instância do DAO para acesso ao banco de dados dos filmes */
     private MovieDAO movieDAO = new MovieDAO();
 
+    /**
+     * Método que trata requisições GET.
+     * Roteia ações de acordo com o parâmetro 'action'.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -51,11 +60,17 @@ public class MovieServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Método que trata requisições POST delegando para o doGet.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
     }
 
+    /**
+     * Lista todos os filmes, ou filtrados por busca, exibindo na página movie_list.jsp.
+     */
     private void listMovies(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         String search = request.getParameter("search");
         List<Movie> listMovie;
@@ -68,10 +83,16 @@ public class MovieServlet extends HttpServlet {
         request.getRequestDispatcher("movie_list.jsp").forward(request, response);
     }
 
+    /**
+     * Exibe o formulário para cadastro de um novo filme.
+     */
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("movie_form.jsp").forward(request, response);
     }
 
+    /**
+     * Realiza a inserção de um novo filme no banco, após validação dos dados.
+     */
     private void insertMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         try {
             Movie newMovie = new Movie();
@@ -81,6 +102,7 @@ public class MovieServlet extends HttpServlet {
             String genre = request.getParameter("genre");
             String synopsis = request.getParameter("synopsis");
 
+            // Valida dados fornecidos pelo usuário
             validateMovieFields(title, director, yearStr, genre, synopsis);
 
             newMovie.setTitle(title);
@@ -92,17 +114,24 @@ public class MovieServlet extends HttpServlet {
             movieDAO.insert(newMovie);
             response.sendRedirect("movies");
         } catch (IllegalArgumentException e) {
+            // Em caso de erro, encaminha mensagem para o formulário
             request.setAttribute("errorMessage", e.getMessage());
             request.getRequestDispatcher("movie_form.jsp").forward(request, response);
         }
     }
 
+    /**
+     * Remove um filme pelo seu id.
+     */
     private void deleteMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         movieDAO.delete(id);
         response.sendRedirect("movies");
     }
 
+    /**
+     * Exibe o formulário de edição com dados do filme existente.
+     */
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         Movie existingMovie = movieDAO.findById(id);
@@ -110,6 +139,9 @@ public class MovieServlet extends HttpServlet {
         request.getRequestDispatcher("movie_form.jsp").forward(request, response);
     }
 
+    /**
+     * Atualiza os dados do filme, após validação dos campos.
+     */
     private void updateMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
@@ -138,6 +170,9 @@ public class MovieServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Exibe os detalhes do filme.
+     */
     private void viewMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         Movie movie = movieDAO.findById(id);
@@ -145,6 +180,15 @@ public class MovieServlet extends HttpServlet {
         request.getRequestDispatcher("movie_detail.jsp").forward(request, response);
     }
 
+    /**
+     * Valida os dados dos campos do formulário de filme.
+     * @param title título do filme
+     * @param director diretor do filme
+     * @param yearStr ano de lançamento (string para validação e conversão)
+     * @param genre gênero do filme
+     * @param synopsis sinopse do filme
+     * @throws IllegalArgumentException em caso de dados inválidos
+     */
     private void validateMovieFields(String title, String director, String yearStr, String genre, String synopsis) {
         if (title == null || title.trim().isEmpty() || title.length() > 255) {
             throw new IllegalArgumentException("Title is required and cannot exceed 255 characters.");
