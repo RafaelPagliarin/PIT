@@ -1,0 +1,109 @@
+/* styles.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 20px 0;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto 40px auto;
+    background-color: white;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    color: #1a73e8;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.95em;
+}
+
+th {
+    background-color: #e3f2fd;
+}
+
+button, input[type="submit"] {
+    background-color: #1a73e8;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #155ab6;
+}
+
+input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 12px;
+    margin: 6px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+a {
+    color: #1a73e8;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 0.9em;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.btn-link {
+    font-size: 24px;
+    text-decoration: none;
+    color: #1a73e8;
+    padding: 10px 20px;
+    border: 2px solid #1a73e8;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-link:hover {
+    background-color: #1a73e8;
+    color: white;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 20px 0;
+}

@@ -49,6 +49,30 @@ public class MovieDAO {
         return movies;
     }
 
+    public List<Movie> findBySearch(String search) throws SQLException {
+        List<Movie> result = new ArrayList<>();
+        String sql = "SELECT * FROM movie WHERE title ILIKE ? OR director ILIKE ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            String searchPattern = "%" + search + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(rs.getInt("id"));
+                    movie.setTitle(rs.getString("title"));
+                    movie.setDirector(rs.getString("director"));
+                    movie.setYear(rs.getInt("year"));
+                    movie.setGenre(rs.getString("genre"));
+                    movie.setSynopsis(rs.getString("synopsis"));
+                    result.add(movie);
+                }
+            }
+        }
+        return result;
+    }
+
     public Movie findById(int id) throws SQLException {
         Movie movie = null;
         String sql = "SELECT * FROM movie WHERE id = ?";

@@ -1,19 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="https://jakarta.ee/xml/ns/jakartaee/jsp/jstl/core" prefix="c" %>
-<%
-    com.yourname.catalog.model.Movie movie = (com.yourname.catalog.model.Movie) request.getAttribute("movie");
-%>
 <html>
 <head>
+    <link rel="stylesheet" href="css/styles.css" />
     <title>Movie Details</title>
 </head>
 <body>
-<h2>Movie Details</h2>
-<p><strong>Title:</strong> <%= movie.getTitle() %></p>
-<p><strong>Director:</strong> <%= movie.getAuthor() %></p>
-<p><strong>Year:</strong> <%= movie.getYear() %></p>
-<p><strong>Genre:</strong> <%= movie.getGenre() %></p>
-<p><strong>Synopsis:</strong><br/> <%= movie.getSynopsis() %></p>
-<a href="movies">Back to list</a>
+    <div class="container">
+        <h2>Movie Details</h2>
+
+        <p><b>Title:</b> ${movie.title}</p>
+        <p><b>Director:</b> ${movie.director}</p>
+        <p><b>Year:</b> ${movie.year}</p>
+        <p><b>Genre:</b> ${movie.genre}</p>
+        <p><b>Synopsis:</b> ${movie.synopsis}</p>
+
+        <button onclick="location.href='movies'">Back to List</button>
+    </div>
 </body>
 </html>

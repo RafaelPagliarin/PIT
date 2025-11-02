@@ -60,10 +60,17 @@ public class MovieServlet extends HttpServlet {
     }
 
     private void listMovies(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Movie> listMovie = movieDAO.findAll();
+        String search = request.getParameter("search");
+        List<Movie> listMovie;
+        if (search != null && !search.trim().isEmpty()) {
+            listMovie = movieDAO.findBySearch(search);
+        } else {
+            listMovie = movieDAO.findAll();
+        }
         request.setAttribute("listMovie", listMovie);
         request.getRequestDispatcher("movie_list.jsp").forward(request, response);
     }
+
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("movie_form.jsp").forward(request, response);

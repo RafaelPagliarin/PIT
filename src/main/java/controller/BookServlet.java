@@ -60,7 +60,13 @@ public class BookServlet extends HttpServlet {
     }
 
     private void listBooks(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Book> listBook = bookDAO.findAll();
+        String search = request.getParameter("search");
+        List<Book> listBook;
+        if (search != null && !search.trim().isEmpty()) {
+            listBook = bookDAO.findBySearch(search);
+        } else {
+            listBook = bookDAO.findAll();
+        }
         request.setAttribute("listBook", listBook);
         request.getRequestDispatcher("book_list.jsp").forward(request, response);
     }
