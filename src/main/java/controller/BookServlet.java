@@ -9,8 +9,6 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 
 @WebServlet("/books")
 public class BookServlet extends HttpServlet {
@@ -53,7 +51,6 @@ public class BookServlet extends HttpServlet {
         }
     }
 
-    // POST method delegates to doGet for form submissions
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -75,16 +72,30 @@ public class BookServlet extends HttpServlet {
         request.getRequestDispatcher("book_form.jsp").forward(request, response);
     }
 
-    private void insertBook(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        Book newBook = new Book();
-        newBook.setTitle(request.getParameter("title"));
-        newBook.setAuthor(request.getParameter("author"));
-        newBook.setYear(Integer.parseInt(request.getParameter("year")));
-        newBook.setGenre(request.getParameter("genre"));
-        newBook.setSynopsis(request.getParameter("synopsis"));
+    private void insertBook(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        try {
+            Book newBook = new Book();
+            String title = request.getParameter("title");
+            String author = request.getParameter("author");
+            String yearStr = request.getParameter("year");
+            String genre = request.getParameter("genre");
+            String synopsis = request.getParameter("synopsis");
 
-        bookDAO.insert(newBook);
-        response.sendRedirect("books");
+            // Validação básica
+            validateBookFields(title, author, yearStr, genre, synopsis);
+
+            newBook.setTitle(title);
+            newBook.setAuthor(author);
+            newBook.setYear(Integer.parseInt(yearStr));
+            newBook.setGenre(genre);
+            newBook.setSynopsis(synopsis);
+
+            bookDAO.insert(newBook);
+            response.sendRedirect("books");
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("book_form.jsp").forward(request, response);
+        }
     }
 
     private void deleteBook(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
@@ -100,18 +111,33 @@ public class BookServlet extends HttpServlet {
         request.getRequestDispatcher("book_form.jsp").forward(request, response);
     }
 
-    private void updateBook(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        Book book = new Book();
-        book.setId(id);
-        book.setTitle(request.getParameter("title"));
-        book.setAuthor(request.getParameter("author"));
-        book.setYear(Integer.parseInt(request.getParameter("year")));
-        book.setGenre(request.getParameter("genre"));
-        book.setSynopsis(request.getParameter("synopsis"));
+    private void updateBook(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Book book = new Book();
 
-        bookDAO.update(book);
-        response.sendRedirect("books");
+            String title = request.getParameter("title");
+            String author = request.getParameter("author");
+            String yearStr = request.getParameter("year");
+            String genre = request.getParameter("genre");
+            String synopsis = request.getParameter("synopsis");
+
+            // Validação básica
+            validateBookFields(title, author, yearStr, genre, synopsis);
+
+            book.setId(id);
+            book.setTitle(title);
+            book.setAuthor(author);
+            book.setYear(Integer.parseInt(yearStr));
+            book.setGenre(genre);
+            book.setSynopsis(synopsis);
+
+            bookDAO.update(book);
+            response.sendRedirect("books");
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("book_form.jsp").forward(request, response);
+        }
     }
 
     private void viewBook(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -119,5 +145,31 @@ public class BookServlet extends HttpServlet {
         Book book = bookDAO.findById(id);
         request.setAttribute("book", book);
         request.getRequestDispatcher("book_detail.jsp").forward(request, response);
+    }
+
+    private void validateBookFields(String title, String author, String yearStr, String genre, String synopsis) {
+        if (title == null || title.trim().isEmpty() || title.length() > 255) {
+            throw new IllegalArgumentException("Title is required and cannot exceed 255 characters.");
+        }
+        if (author == null || author.trim().isEmpty() || author.length() > 255) {
+            throw new IllegalArgumentException("Author is required and cannot exceed 255 characters.");
+        }
+        if (yearStr == null || yearStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("Year is required.");
+        }
+        try {
+            int year = Integer.parseInt(yearStr);
+            if (year < 0 || year > 9999) { // Ajuste conforme necessidade
+                throw new IllegalArgumentException("Year must be between 0 and 9999.");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Year must be a valid number.");
+        }
+        if (genre == null || genre.trim().isEmpty() || genre.length() > 100) {
+            throw new IllegalArgumentException("Genre is required and cannot exceed 100 characters.");
+        }
+        if (synopsis != null && synopsis.length() > 1000) {
+            throw new IllegalArgumentException("Synopsis cannot exceed 1000 characters.");
+        }
     }
 }

@@ -11,7 +11,6 @@ public class MovieDAO {
 
     public void insert(Movie movie) throws SQLException {
         String sql = "INSERT INTO movie (title, director, year, genre, synopsis) VALUES (?, ?, ?, ?, ?)";
-
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -41,7 +40,6 @@ public class MovieDAO {
                 movie.setYear(rs.getInt("year"));
                 movie.setGenre(rs.getString("genre"));
                 movie.setSynopsis(rs.getString("synopsis"));
-
                 movies.add(movie);
             }
         }

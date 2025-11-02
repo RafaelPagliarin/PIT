@@ -7,6 +7,11 @@
 <body>
     <div class="container">
         <h2><c:out value="${movie != null ? 'Edit Movie' : 'New Movie'}"/></h2>
+
+        <c:if test="${not empty errorMessage}">
+            <div class="error">${errorMessage}</div>
+        </c:if>
+
         <form action="movies?action=${movie != null ? 'update' : 'insert'}" method="post">
             <input type="hidden" name="id" value="${movie.id}"/>
 

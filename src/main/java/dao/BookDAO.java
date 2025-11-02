@@ -13,8 +13,7 @@ public class BookDAO {
 
     public void insert(Book book) throws SQLException {
         String sql = "INSERT INTO book (title, author, year, genre, synopsis) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, book.getTitle());
@@ -31,7 +30,7 @@ public class BookDAO {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM book ORDER BY id";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -43,7 +42,6 @@ public class BookDAO {
                 book.setYear(rs.getInt("year"));
                 book.setGenre(rs.getString("genre"));
                 book.setSynopsis(rs.getString("synopsis"));
-
                 books.add(book);
             }
         }
@@ -53,13 +51,13 @@ public class BookDAO {
 
     public List<Book> findBySearch(String search) throws SQLException {
         List<Book> result = new ArrayList<>();
-        String sql = "SELECT * FROM books WHERE title ILIKE ? OR author ILIKE ?";
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        String sql = "SELECT * FROM book WHERE title ILIKE ? OR author ILIKE ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             String searchPattern = "%" + search + "%";
-            statement.setString(1, searchPattern);
-            statement.setString(2, searchPattern);
-            try (ResultSet rs = statement.executeQuery()) {
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Book book = new Book();
                     book.setId(rs.getInt("id"));
@@ -79,7 +77,7 @@ public class BookDAO {
         Book book = null;
         String sql = "SELECT * FROM book WHERE id = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -103,7 +101,7 @@ public class BookDAO {
     public void update(Book book) throws SQLException {
         String sql = "UPDATE book SET title = ?, author = ?, year = ?, genre = ?, synopsis = ? WHERE id = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, book.getTitle());
@@ -120,7 +118,7 @@ public class BookDAO {
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM book WHERE id = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -128,4 +126,3 @@ public class BookDAO {
         }
     }
 }
-

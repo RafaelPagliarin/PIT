@@ -9,6 +9,11 @@
 <body>
     <div class="container">
         <h2><c:out value="${book != null ? 'Edit Book' : 'New Book'}"/></h2>
+
+        <c:if test="${not empty errorMessage}">
+            <div class="error">${errorMessage}</div>
+        </c:if>
+
         <form action="books?action=${book != null ? 'update' : 'insert'}" method="post">
             <input type="hidden" name="id" value="${book.id}"/>
 

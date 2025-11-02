@@ -9,8 +9,6 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 
 @WebServlet("/movies")
 public class MovieServlet extends HttpServlet {
@@ -53,7 +51,6 @@ public class MovieServlet extends HttpServlet {
         }
     }
 
-    // POST method delegates to doGet for form submissions
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -71,21 +68,33 @@ public class MovieServlet extends HttpServlet {
         request.getRequestDispatcher("movie_list.jsp").forward(request, response);
     }
 
-
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("movie_form.jsp").forward(request, response);
     }
 
-    private void insertMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        Movie newMovie = new Movie();
-        newMovie.setTitle(request.getParameter("title"));
-        newMovie.setDirector(request.getParameter("director"));
-        newMovie.setYear(Integer.parseInt(request.getParameter("year")));
-        newMovie.setGenre(request.getParameter("genre"));
-        newMovie.setSynopsis(request.getParameter("synopsis"));
+    private void insertMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        try {
+            Movie newMovie = new Movie();
+            String title = request.getParameter("title");
+            String director = request.getParameter("director");
+            String yearStr = request.getParameter("year");
+            String genre = request.getParameter("genre");
+            String synopsis = request.getParameter("synopsis");
 
-        movieDAO.insert(newMovie);
-        response.sendRedirect("movies");
+            validateMovieFields(title, director, yearStr, genre, synopsis);
+
+            newMovie.setTitle(title);
+            newMovie.setDirector(director);
+            newMovie.setYear(Integer.parseInt(yearStr));
+            newMovie.setGenre(genre);
+            newMovie.setSynopsis(synopsis);
+
+            movieDAO.insert(newMovie);
+            response.sendRedirect("movies");
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("movie_form.jsp").forward(request, response);
+        }
     }
 
     private void deleteMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
@@ -101,18 +110,32 @@ public class MovieServlet extends HttpServlet {
         request.getRequestDispatcher("movie_form.jsp").forward(request, response);
     }
 
-    private void updateMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        Movie movie = new Movie();
-        movie.setId(id);
-        movie.setTitle(request.getParameter("title"));
-        movie.setDirector(request.getParameter("director"));
-        movie.setYear(Integer.parseInt(request.getParameter("year")));
-        movie.setGenre(request.getParameter("genre"));
-        movie.setSynopsis(request.getParameter("synopsis"));
+    private void updateMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Movie movie = new Movie();
 
-        movieDAO.update(movie);
-        response.sendRedirect("movies");
+            String title = request.getParameter("title");
+            String director = request.getParameter("director");
+            String yearStr = request.getParameter("year");
+            String genre = request.getParameter("genre");
+            String synopsis = request.getParameter("synopsis");
+
+            validateMovieFields(title, director, yearStr, genre, synopsis);
+
+            movie.setId(id);
+            movie.setTitle(title);
+            movie.setDirector(director);
+            movie.setYear(Integer.parseInt(yearStr));
+            movie.setGenre(genre);
+            movie.setSynopsis(synopsis);
+
+            movieDAO.update(movie);
+            response.sendRedirect("movies");
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("movie_form.jsp").forward(request, response);
+        }
     }
 
     private void viewMovie(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -120,5 +143,31 @@ public class MovieServlet extends HttpServlet {
         Movie movie = movieDAO.findById(id);
         request.setAttribute("movie", movie);
         request.getRequestDispatcher("movie_detail.jsp").forward(request, response);
+    }
+
+    private void validateMovieFields(String title, String director, String yearStr, String genre, String synopsis) {
+        if (title == null || title.trim().isEmpty() || title.length() > 255) {
+            throw new IllegalArgumentException("Title is required and cannot exceed 255 characters.");
+        }
+        if (director == null || director.trim().isEmpty() || director.length() > 255) {
+            throw new IllegalArgumentException("Director is required and cannot exceed 255 characters.");
+        }
+        if (yearStr == null || yearStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("Year is required.");
+        }
+        try {
+            int year = Integer.parseInt(yearStr);
+            if (year < 0 || year > 9999) {
+                throw new IllegalArgumentException("Year must be between 0 and 9999.");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Year must be a valid number.");
+        }
+        if (genre == null || genre.trim().isEmpty() || genre.length() > 100) {
+            throw new IllegalArgumentException("Genre is required and cannot exceed 100 characters.");
+        }
+        if (synopsis != null && synopsis.length() > 1000) {
+            throw new IllegalArgumentException("Synopsis cannot exceed 1000 characters.");
+        }
     }
 }
